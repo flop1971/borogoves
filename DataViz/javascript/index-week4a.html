@@ -1,0 +1,453 @@
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif
+        }
+
+        h1 {
+            background-color: #2a5599;
+            /* TODO 1
+            change the text to white and add a padding of 5px
+            2 lines of code
+            */
+            color: white;
+            padding: 5px;
+        }
+
+        /* TODO 2
+        Add code to show a black border of 1px around all SVGs elements in the page
+        1-3 lines of code
+        */
+
+        .mainView svg {
+            border: 1px solid black;
+        }
+
+        /* TODO 3
+         - Use the "display flex" feature from to show the items from class `mainView` side by side 
+         1-3 lines of cide
+        */
+
+        .mainView {
+            display: flex;
+        }
+
+    </style>
+    <script src="d3.js"></script>
+
+    <!-- Add this line to your file -->
+</head>
+
+<body>
+    <h1>Airlines Routes</h1>
+    <div class="mainView">
+        <div>
+            <h2>Airlines</h2>
+            <svg id="AirlinesChart"></svg>
+        </div>
+        <div>
+            <h2>Airports</h2>
+            <svg id="Map"></svg>
+        </div>
+    </div>
+
+    <div id="container"></div>
+</body>
+<!-- Add this section to your file -->
+<script>
+    // All your javascript code will go here
+    // python3 -m http.server
+    
+    // Creating a variable to store our data
+    let store = {};
+
+// Loading Map Information, promise -> asyn
+function loadData() {
+    return Promise.all([
+        d3.csv("https://lvdesign.com.fr/d3jsdocs/routes.csv"),
+        d3.json("https://lvdesign.com.fr/d3jsdocs/countries.geo.json"),
+    ]).then(datasets => {
+        store.routes = datasets[0];
+        store.geoJSON = datasets[1]
+        return store;
+    })
+}
+
+//Preparing The Data
+// Recuperation de ID, AirlineID, AirlineName,
+    function groupByAirline(data) {
+        /*
+        ID, AirlineID, AirlineName, 
+
+        AirlineCountry,SourceAirportID,
+        SourceAirportCode,SourceAirport,SourceCity,
+        SourceCountry,SourceLatitude,SourceLongitude,
+        DestAirportID,DestCode,DestAirport,DestCity,DestCountry,DestLatitude,DestLongitude
+
+        1,24,American Airlines,
+        
+        United States,4355,ABE,Lehigh Valley International Airport,Allentown,
+        United States,40.65209961,-75.44080353,3876,CLT,Charlotte Douglas International Airport,
+        Charlotte,United States,35.2140007,-80.94309998
+
+        */
+    
+    // Iterate over each route, producing a dictionary 
+    // where the keys is are the ailines ids 
+    // and the values are the information of the airline.
+    // data est un array
+    let result = data.reduce( (result, d) => {
+        let currentData = result[d.AirlineID] || {
+            "AirlineID": d.AirlineID,
+            "AirlineName": d.AirlineName,
+            "Count": 0
+        }
+        
+        currentData.Count += 1; //TODO: Increment the count (number of routes) of ariline.
+        
+        result[d.AirlineID] = {
+            "AirlineID":d.AirlineID, "AirlineName":d.AirlineName,"Count":currentData.Count
+            
+        }//TODO: Save the updated information in the dictionary using the airline id as key.
+
+        return result;
+    }, {})
+
+    //We use this to convert the dictionary produced by the code above, 
+    //into a list, that will make it easier to create the visualization. 
+    result = Object.keys(result).map(key => result[key])
+    // console.log('Result Key value', result )
+    //TODO: Sort the data in descending order of count.
+    result = result.sort((a,b) => { return d3.descending(a.Count,b.Count) })
+        
+    return result;        
+}
+
+    
+// Running it
+loadData().then(showData);
+
+
+// BAR _____________________
+//Part3
+function drawAirlinesChart(airlines) {
+    let config = getAirlinesChartConfig();
+    let scales = getAirlinesChartScales(airlines, config);
+    drawBarsAirlinesChart(airlines, scales, config)
+    drawAxesAirlinesChart(airlines, scales, config);
+}
+
+// Config Chart
+function getAirlinesChartConfig() {
+    let width = 350;
+    let height = 400;
+    let margin = {
+        top: 10,
+        bottom: 50,
+        left: 130,
+        right: 10
+    }
+    //The body is the are that will be occupied by the bars.
+    let bodyHeight = height - margin.top - margin.bottom;
+    let bodyWidth = width - margin.left - margin.right ; 
+    //TODO: Compute the width of the body by subtracting the left and right margins from the width.
+
+    //The container is the SVG where we will draw the chart. In our HTML is the svg tah with the id AirlinesChart
+    let container = d3.select('#AirlinesChart'); //TODO: use d3.select to select the element with id AirlinesChart 
+        container
+        .attr("width", width)
+        .attr("height", height)
+        //TODO: Set the height of the container
+
+    return { width, height, margin, bodyHeight, bodyWidth, container }
+}
+
+// Scales
+function getAirlinesChartScales(airlines, config) {
+    let { bodyWidth, bodyHeight } = config;
+    let maximunCount = d3.max( airlines, (airlines) => airlines.Count);  
+    //TODO: Use d3.max to get the highest Count value we have on the airlines list.
+    console.log('Count Airlines--', maximunCount)
+
+    let xScale = d3.scaleLinear()
+        .range([0,bodyWidth])
+        .domain([0, maximunCount])
+        //TODO: Set the range to go from 0 to the width of the body
+        //TODO: Set the domain to go from 0 to the maximun value fount for the field 'Count'
+
+    let yScale = d3.scaleBand()
+        .range([0, bodyHeight])
+        .domain(airlines.map(a => a.AirlineName)) //The domain is the list of ailines names
+        .padding(0.2)
+        
+    return { xScale, yScale }
+}
+
+// Drawing the bars
+function drawBarsAirlinesChart(airlines, scales, config) {
+  let {margin, container} = config; // this is equivalent to 'let margin = config.margin; let container = config.container'
+  let {xScale, yScale} = scales
+  let body = container.append("g")
+      .style("transform", 
+        `translate(${margin.left}px,${margin.top}px)`
+      )
+
+  let bars = body.selectAll(".bar").data(airlines)
+      //TODO: Use the .data method to bind the airlines to the bars (elements with class bar)
+
+  //Adding a rect tag for each airline
+  bars.enter().append("rect")
+      .attr("height", yScale.bandwidth())
+      .attr("y", (d) => yScale(d.AirlineName))
+      .attr("width", (d) => xScale(d.Count) )
+      //TODO: set the width of the bar to be proportional to the airline count using the xScale
+      .attr("fill", "#2a5599")
+
+
+
+
+/* ****************************************************** */
+// PLus PartEND ******************************************************
+        .on("mouseenter", function(d ){   
+            //debugger; 
+            d => drawRoutes('d.airlineID') //TODO: call the drawRoutes function passing the AirlineID id 'd'-> d.AirlineID
+            d3.select(this)
+            this.style.fill= "#992a5b"; // <- this is the new code
+            //TODO: change the fill color of the bar to "#992a5b" as a way to highlight the bar. 
+            //Hint: use d3.select(this)
+            console.log(' Moussenter -> return d.AirlineID ::::' , d.AirlineID)
+            return drawRoutes(d.AirlineID);
+            
+        })
+  
+    //drawRoutes(null); //TODO: In this listener, call drawRoutes(null),
+        .on("mouseleave", function(d) { //TODO: Add another listener, this time for mouseleave
+            d3.select(this)
+            this.style.fill= "#2a5599";
+        
+            d => drawRoutes('d.airlineID')
+            d.AirlineID == null;
+            //d => drawRoutes(null);
+        
+        //
+        console.log('ddd',d)
+        
+        //TODO: In this listener, call drawRoutes(null),
+        
+            console.log('MouseLeave -- la route selection : ', d.AirlineID ) 
+        return drawRoutes(null);
+            
+        })
+        //this will cause the function to remove all lines in the chart since there is no airline with the AirlineID == null.
+        //TODO: change the fill color of the bar back to "#2a5599"
+
+}
+
+// Axes 
+function drawAxesAirlinesChart(airlines, scales, config){
+  let {xScale, yScale} = scales
+  let {container, margin, height} = config;
+  let axisX = d3.axisBottom(xScale).ticks(5)
+
+  container.append("g")
+    .style("transform", 
+        `translate(${margin.left}px,${height - margin.bottom}px)`
+    )
+    .call(axisX)
+
+  let axisY = d3.axisLeft(yScale)
+
+  //TODO: Create an axis on the left for the Y scale
+  //TODO: Append a g tag to the container, translate it based on the margins and call the axisY axis to draw the left axis.
+
+  container.append("g")
+    .style("transform", 
+        `translate(${margin.left}px,${margin.top}px)`
+    )
+    .call(axisY)
+}
+
+// ass4
+
+// Map Config
+function getMapConfig(){
+  let width = 600;
+  let height = 400;
+  let container = d3.select('#Map'); //TODO: select the svg with id Map
+        container
+            .attr("width", width)
+            .attr("height", height) 
+     //TODO: set the width and height of the container to be equal the width and height variables.
+  return {width, height, container}
+}
+
+// Projection
+function getMapProjection(config) {
+  let {width, height} = config;
+  let projection = d3.geoMercator(); //TODO: Create a projection of type Mercator.
+        projection.scale(97).translate([width / 2, height / 2 + 20])
+            
+  store.mapProjection = projection;
+  return projection;
+}
+
+// Drawing The Map
+function drawBaseMap(container, countries, projection){
+  let path = d3.geoPath()
+    .projection(projection); //TODO: create a geoPath generator and set its projection to be the projection passed as parameter.
+  
+  container.selectAll("path").data(countries)
+      .enter().append("path")
+      .attr("d", d => path(d)) // TODO: use the path generator to draw each country 
+      .attr("stroke", "#ccc")
+      .attr("fill", "#eee")
+}
+
+// Calling The Functions
+function drawMap(geoJeon) {
+    let config = getMapConfig();
+    let projection = getMapProjection(config)
+    drawBaseMap(config.container, geoJeon.features, projection)
+}
+
+
+// ass5
+//Grouping By Airports
+function groupByAirport(data) {
+    //We use reduce to transform a list into a object where each key points to an aiport. 
+    //This way makes it easy to check if is the first time we are seeing the airport.
+    let result = data.reduce((result, d) => {
+        //The || sign in the line below means that in case the first option is anything 
+        //that Javascript consider false (this insclude undefined, null and 0), 
+        //the second option will be used. Here if result[d.DestAirportID] is false, 
+        //it means that this is the first time we are seeing the airport, so we will create a new one (second part after ||)
+        
+        let currentDest = result[d.DestAirportID] || {
+            "AriportID": d.DestAirportID,
+            "Airport": d.DestAirport,
+            "Latitude": +d.DestLatitude,
+            "Longitude": +d.DestLongitude,
+            "City": d.DestCity,
+            "Country": d.DestCountry,
+            "Count": 0
+        }
+        currentDest.Count += 1
+        result[d.DestAirportID] = currentDest
+
+        //After doing for the destination airport, we also update the airport the airplane is departing from.
+        let currentSource = result[d.SourceAirportID] || {
+            "AriportID": d.SourceAirportID,
+            "Airport": d.SourceAirport,
+            "Latitude": +d.SourceLatitude,
+            "Longitude": +d.SourceLongitude,
+            "City": d.SourceCity,
+            "Country": d.SourceCountry,
+            "Count": 0
+        }
+        currentSource.Count += 1
+        result[d.SourceAirportID] = currentSource
+
+        return result
+    }, {})
+    
+    //We map the keys to the actual ariorts, this is an way to transform the object we got in the previous step into a list.
+    result = Object.keys(result).map(key => result[key])
+    return result
+}
+
+// Draw Airports
+function drawAirports(airports) {
+  let config = getMapConfig(); //get the config
+  let projection = getMapProjection(config) //get the projection
+  let container = config.container; //get the container
+        
+  let circles = container.selectAll("circle");
+  circles
+    .data(airports)  //TODO: bind the airports to the circles using the .data method.
+    .enter()
+    .append("circle")
+    .attr('r',1)
+    .attr( "cx", d => projection([+d.Longitude, +d.Latitude])[0] )
+    .attr( "cy", d => projection([+d.Longitude, +d.Latitude])[1] )
+    .attr( "fill", "#2a5599" )
+  
+  //TODO: for each new airport (hint: .enter)
+  //      - Set the radius to 1
+  //      - set the x and y position of the circle 
+  //            using the projection to convert longitude and latitude to x and y porision.
+  //      - Set the fill color of the circle to  "#2a5599"
+}
+
+
+/* ***********************   ******** *********************** */
+// ass6 part6
+// Drawing Routes
+function drawRoutes(airlineID) {
+    //debugger;
+    //let  selectedRoutes=[]
+    let routes = store.routes; //TODO: get the routes from store 
+    let projection = store.mapProjection ; // TODO: get the projection from the store 
+    let container = d3.select("#Map");  //TODO: select the svg with id "Map" (our map container)
+  
+   let selectedRoutes = routes.filter( d =>  d.AirlineID == airlineID )
+
+    console.log('drawRoutes -- airlineID -- ', airlineID)
+    console.log( 'drawRoutes: my select route => ', selectedRoutes )
+    console.log( ' <== End my select route')
+    
+    let bindedData = container.selectAll("line")
+
+        .data(selectedRoutes, d => d.ID) 
+        .enter() //TODO: Use the .enter selector to append a line for each new route.
+        .append('line')   
+       
+        .attr( "cx", d => projection([+d.Longitude, +d.Latitude])[0] )
+        .attr( "cy", d => projection([+d.Longitude, +d.Latitude])[1] )
+
+        .attr("x1", d => +d.SourceLongitude )  //TODO: for each line set the start of the line (x1 and y1) 
+        .attr("y1", d => +d.SourceLatitude  ) 
+    
+        .attr("x2", d =>  +d.DestLongitude  )  //TODO: for each line set the end of the line (x2 and y2) 
+        .attr("y2", d =>  +d.DestLatitude  ) 
+
+       
+
+    
+        .attr("stroke","#992a2a")   //TODO: set the color of the stroke of the line to "#992a2a"
+            
+        .attr("opacity",0.1)    //TODO: set the opacity to 0.1
+        
+        console.log( ' DATA :::: my select route :::', selectedRoutes )
+
+        //TODO: use exit function over bindedData to remove any routes that does not satisfy the filter.
+        //
+        //
+       bindedData.exit().remove()
+}
+
+
+
+
+// Init function
+function showData() {
+    //Get the routes from our store variable
+    let routes = store.routes
+    // Compute the number of routes per airline.
+    let airlines = groupByAirline(store.routes);
+    //console.log(airlines)
+    drawAirlinesChart(airlines)
+    drawMap(store.geoJSON)
+
+    let airports = groupByAirport(store.routes);
+    drawAirports(airports)
+  
+drawRoutes("24") // <- add this line 24
+
+}
+
+
+</script>
+
+</html>

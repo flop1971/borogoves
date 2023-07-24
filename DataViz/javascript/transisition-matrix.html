@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Markov Chains</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="style.css" type="text/css" rel="stylesheet">
+    <script src="d3.min.js"></script>
+    <script src="vector.js"></script>
+    <script src="angular.min.js" charset="utf-8"></script>
+<style>
+.controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.st-diagram {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+}
+.st-diagram .nodes {
+  pointer-events: all;
+}
+.matrix {
+  width:  30%;
+  height: 60%;
+  right: 0;
+  position: absolute;
+  color: white;
+}
+@media only screen and (max-width: 768px) {
+  .st-diagram {
+    width: 100%;
+    height: 50%;
+  }
+  .matrix {
+    width: 100%;
+    height: 50%;
+    bottom: 0;
+  }
+}
+.matrix .cell {
+  position: relative;
+  float: left;
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+  border: 1px solid #f3f3f3;
+}
+.matrix .cell .desc {
+  position: relative;
+}
+.matrix .cell .control input {
+  text-align: center;
+  width: 70%;
+}
+</style>
+</head>
+<body ng-app="myApp" ng-controller="MainCtrl">
+  <st-diagram center="diagramCenter" states="states"
+    transition-matrix="transitionMatrix" duration="duration"
+    selected-transition="selected.transition"></st-diagram>
+  <grid class="matrix">
+    <row>
+      <cell></cell>
+      <cell style="line-height:{{height}}px;background-color:{{color('A')}}">Long</cell>
+      <cell style="line-height:{{height}}px;background-color:{{color('B')}}">Short</cell>
+    </row>
+    <row>
+    <div ng-style="{'background-color': color('A')}"
+        style="width:100%;height:100%">
+        <cell>
+          <div style="text-align: center; line-height:{{height}}px"> Long </div>
+        </cell>
+        <cell ng-mouseover="selected.transition = [0, 0]"
+          ng-mouseout="selected.transition = null">
+          <div class="desc">
+            P(Long|Long): {{ transitionMatrix[0][0] | number:2 }}
+          </div>
+          <div class="control">
+            <input type="range" min="0" max="1" step="0.01"
+              ng-change="onChangeMatrixValue(0, 0)"
+              ng-model="transitionMatrix[0][0]">
+          </div>
+        </cell>
+        <cell ng-mouseover="selected.transition = [0, 1]"
+          ng-mouseout="selected.transition = null">
+          <div class="desc">
+            P(Short|Long): {{ transitionMatrix[0][1] | number:2 }}
+          </div>
+          <div class="control">
+            <input type="range" min="0" max="1" step="0.01"
+              ng-change="onChangeMatrixValue(0, 1)"
+              ng-model="transitionMatrix[0][1]">
+          </div>
+        </cell>
+      </div>
+    </row>
+    <row>
+      <div ng-style="{'background-color': color('B')}"
+          style="width:100%;height:100%">
+        <cell>
+          <div style="text-align: center; line-height:{{height}}px"> Short </div>
+        </cell>
+        <cell ng-mouseover="selected.transition = [1, 0]"
+          ng-mouseout="selected.transition = null">
+          <div class="desc">
+            P(Long|Short): {{ transitionMatrix[1][0] | number:2 }}
+          </div>
+          <div class="control">
+            <input type="range" min="0" max="1" step="0.01"
+              ng-change="onChangeMatrixValue(1, 0)"
+              ng-model="transitionMatrix[1][0]">
+          </div>
+        </cell>
+        <cell ng-mouseover="selected.transition = [1, 1]"
+          ng-mouseout="selected.transition = null">
+          <div class="desc">
+            P(Short|Short): {{ transitionMatrix[1][1] | number:2 }}
+          </div>
+          <div class="control">
+            <input type="range" min="0" max="1" step="0.01"
+              ng-change="onChangeMatrixValue(1, 1)"
+              ng-model="transitionMatrix[1][1]">
+          </div>
+        </cell>
+      </div>
+    </row>
+  </grid>
+  <div class="controls">
+    <input class="speedRange" type="range" ng-model="speedRange"
+      min="1" max="20" step="1">
+    <label> Speed </label>
+  </div>
+</body>
+<script>
+
+var myApp = angular.module('myApp', []);
+
+myApp.controller('MainCtrl', function($scope, utils, $window) {
+  angular.element($window).on('resize', function() { $scope.$apply(); });
+  $scope.diagramCenter = [0.40, 0.5];
+  $scope.selected = { transition: null };
+  $scope.color = d3.scale.category10();
+  //$scope.color =  d3.scaleOrdinal(d3.schemeCategory10);
+  
+  $scope.isSelectedTransition = function(i, j) {
+    return !!$scope.selected.transition;
+  };
+  $scope.states = [
+    { label: 'Long', index: 0 },
+    { label: 'Short', index: 1 }
+  ];
+  $scope.speedRange = 2;
+  $scope.$watch('speedRange', function(speed) {
+    $scope.duration = 2000 / +speed;
+  });
+
+  $scope.transitionMatrix = [
+    [0.79, 0.21],
+    [0.43, 0.57]
+  ];
+
+  $scope.onChangeMatrixValue = function(idx1, idx2) {
+    utils.normalizeTransitionMatrix($scope.transitionMatrix, idx1, idx2);
+  };
+});
+</script>
+<script src="common.js" charset="utf-8"></script>
+</html>

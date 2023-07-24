@@ -1,0 +1,38 @@
+<httml>
+<!DOCTYPE html>
+<head>
+	<meta charset="UTF-8">
+	<title>My First Page</title>
+
+</head>
+<body>
+	<svg style="border: solid 1px black">
+<rect width="100" height="100" fill="red" />
+  <rect width="50" height="50" fill="blue" />
+	</svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+let container= d3.select("#container");   
+let cars = [ 
+  {name:"toyota", price: 50000},
+  {name:"BMW", price:75000},
+  {name:"Tesla", price: 60000},
+  {name:"Jeep", price: 35000}];
+
+let join = container
+	.selectAll("li")
+	.data(cars);
+
+join.enter()
+	.append("li")
+	.text( ______ )
+
+d => d.name + "" +d.price;
+
+console.log(d);
+
+</script>
+</body>
+</html>
+
