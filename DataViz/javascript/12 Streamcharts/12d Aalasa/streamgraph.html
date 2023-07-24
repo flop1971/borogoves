@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<title>streamgraph branch - Highcharts</title>
+			<style>#container {
+			height: 600px;
+			}
+
+			.highcharts-figure, .highcharts-data-table table {
+			    min-width: 310px; 
+				max-width: 1000px;
+				overflow: auto;
+			    margin: 1em auto;
+			}
+
+			.highcharts-data-table table {
+				font-family: Verdana, sans-serif;
+				border-collapse: collapse;
+				border: 1px solid #EBEBEB;
+				margin: 10px auto;
+				text-align: center;
+				width: 100%;
+				max-width: 500px;
+			}
+			.highcharts-data-table caption {
+			    padding: 1em 0;
+			    font-size: 1.2em;
+			    color: #555;
+			}
+			.highcharts-data-table th {
+				font-weight: 600;
+			    padding: 0.5em;
+			}
+			.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+			    padding: 0.5em;
+			}
+			.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+			    background: #f8f8f8;
+			}
+			.highcharts-data-table tr:hover {
+			    background: #f1f7ff;
+			}
+			</style>
+
+		</head>
+		<body>
+
+		<script src="https://code.highcharts.com/highcharts.js"></script>
+		<script src="https://code.highcharts.com/modules/streamgraph.js"></script>
+		<script src="https://code.highcharts.com/modules/series-label.js"></script>
+		<script src="https://code.highcharts.com/modules/annotations.js"></script>
+		<script src="https://code.highcharts.com/modules/exporting.js"></script>
+		<script src="https://code.highcharts.com/modules/export-data.js"></script>
+		<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+		<figure class="highcharts-figure">
+		    <div id="container"></div>
+		    <p class="highcharts-description">
+		        Streamgraphs are a type of stacked area charts where the
+		        areas are displaced around a central axis. It is often
+		        used for displaying compound volume across different
+		        categories or over time. This chart visualizes the indicent
+                duration of RCA's over time. RCA's comprise of five measureable
+                factors: Detection, Diagnose, Escalatioin, Miitigation & Recovery.
+		    </p>
+		</figure>
+
+
+<script>
+			var colors = Highcharts.getOptions().colors;
+Highcharts.chart('container', {
+
+    chart: {
+        type: 'streamgraph',
+        marginBottom: 30,
+        zoomType: 'x'
+    },
+
+    // Make sure connected countries have similar colors
+    colors: ['#282828', '#5c5c5c', '#1aadce', '#838383', '#c3c3c3',
+        '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
+    // colors: [
+    //     colors[0],
+    //     colors[1],
+    //     colors[2],
+    //     colors[3],
+    //     colors[4],
+    //     // East Germany, West Germany and Germany
+    //     Highcharts.color(colors[5]).brighten(0.2).get(),
+    //     Highcharts.color(colors[5]).brighten(0.1).get(),
+
+    //     colors[5],
+    //     colors[6],
+    //     colors[7],
+    //     colors[8],
+    //     colors[9],
+    //     colors[0],
+    //     colors[1],
+    //     colors[3],
+    //     // Soviet Union, Russia
+    //     Highcharts.color(colors[2]).brighten(-0.1).get(),
+    //     Highcharts.color(colors[2]).brighten(-0.2).get(),
+    //     Highcharts.color(colors[2]).brighten(-0.3).get()
+    // ],
+
+    title: {
+        floating: true,
+        align: 'center',
+        text: 'SCBN Total MEAN Time to Resolution per Incident over Time'
+    },
+    // subtitle: {
+    //     floating: true,
+    //     align: 'left',
+    //     y: 30,
+    //     text: 'Subtitle'
+    // },
+
+    xAxis: {
+        maxPadding: 0,
+        type: 'category',
+        crosshair: true,
+        categories: ['2019-07-09',
+		 '2019-07-19',
+		 '2019-08-01',
+		 '2019-08-05',
+		 '2019-08-12',
+		 '2019-08-15',
+		 '2019-08-16',
+		 '2019-09-06',
+		 '2019-09-06',
+		 '2019-09-09',
+		 '2019-09-11',
+		 '2019-09-11',
+		 '2019-09-11',
+		 '2019-09-11',
+		 '2019-09-13',
+		 '2019-09-16',
+		 '2019-09-24',
+		 '2019-09-24',
+		 '2019-09-25',
+		 '2019-09-26',
+		 '2019-09-26',
+		 '2019-09-27',
+		 '2019-09-30',
+		 '2019-10-04',
+		 '2019-10-16',
+		 '2019-10-30',
+		 '2019-11-05',
+		 '2019-11-05',
+		 '2019-11-20',
+		 '2019-11-20',
+		 '2019-12-04',
+		 '2020-01-03',
+		 '2020-01-06',
+		 '2020-01-06',
+		 '2020-01-06',
+		 '2020-01-17',
+		 '2020-01-24',
+		 '2020-01-28',
+		 '2020-02-06',
+		 '2020-02-07',
+		 '2020-02-17',
+		 '2020-02-19',
+		 ],
+        labels: {
+            align: 'left',
+            reserveSpace: false,
+            rotation: 270
+        },
+        lineWidth: 0,
+        margin: 20,
+        tickWidth: 0
+    },
+
+    yAxis: {
+        visible: false,
+        startOnTick: false,
+        endOnTick: false
+    },
+
+    legend: {
+    	layout: 'horizontal',
+        enabled: true,
+        verticalAlign: 'bottom',
+        // align: 'right',
+        // floating: true,
+        // itemMarginTop: -20,
+        itemMarginBottom: -20,
+        maxHeight: 100,
+    },
+
+    annotations: [{
+        labels: [{
+            point: {
+                x: 4,
+                xAxis: 0,
+                y: 1000,
+                yAxis: 0
+            },
+            text: 'GIODE Translation POD27 Slowdown'
+        }, {
+            point: {
+                x: 31,
+                xAxis: 0,
+                y: 11000,
+                yAxis: 0
+            },
+            text: 'HISPEED Deferred Processing Issue'
+        }],
+        labelOptions: {
+            backgroundColor: 'rgba(255,255,255,0.5)',
+            borderColor: 'silver'
+        }
+    }],
+
+    plotOptions: {
+        series: {
+            label: {
+                minFontSize: 5,
+                maxFontSize: 15,
+                style: {
+                    color: 'rgba(255,255,255,0.75)'
+                }
+            }
+        }
+    },
+
+    // Data parsed with olympic-medals.node.js
+    series: [{
+        name: "Recovery",
+        data: [140,
+ 14,
+ 8,
+ 329,
+ 0,
+ 86,
+ 22,
+ 0,
+ 7,
+ 0,
+ 0,
+ 0,
+ 0,
+ 520,
+ 6,
+ 8,
+ 16,
+ 74,
+ 49,
+ 0,
+ 1341,
+ 17,
+ 13,
+ 8,
+ 142,
+ 2688,
+ 42,
+ 210,
+ 15,
+ 2,
+ 0,
+ 2186,
+ 0,
+ 0,
+ 0,
+ 45,
+ 1,
+ 199,
+ 48,
+ 4,
+ 6,
+ 0]    }, {
+        name: "Mitigation",
+        data: [51,
+ 142,
+ 56,
+ 174,
+ 1386,
+ 47,
+ 95,
+ 52,
+ 156,
+ 195,
+ 69,
+ 85,
+ 22,
+ 0,
+ 9,
+ 68,
+ 70,
+ 77,
+ 5,
+ 375,
+ 219,
+ 18,
+ 17,
+ 131,
+ 17,
+ 221,
+ 43,
+ 365,
+ 124,
+ 174,
+ 356,
+ 21020,
+ 1080,
+ 105,
+ 139,
+ 41,
+ 84,
+ 9,
+ 31,
+ 123,
+ 92,
+ 0]
+    }, {
+        name: "Diagnosis",
+        data: [11,
+ 126,
+ 3,
+ 117,
+ 466,
+ 47,
+ 5,
+ 4,
+ 145,
+ 128,
+ 58,
+ 45,
+ 4,
+ 0,
+ 5,
+ 1,
+ 0,
+ 47,
+ 3,
+ 34,
+ 0,
+ 18,
+ 2,
+ 102,
+ 6,
+ 116,
+ 41,
+ 335,
+ 21,
+ 172,
+ 0,
+ 11518,
+ 1070,
+ 25,
+ 112,
+ 24,
+ 10,
+ 8,
+ 7,
+ 122,
+ 91,
+ 0]
+    }, {
+        name: "Escalation",
+        data: [0,
+ 1,
+ 1,
+ 107,
+ 0,
+ 47,
+ 0,
+ 0,
+ 0,
+ 10,
+ 16,
+ 35,
+ 4,
+ 0,
+ 0,
+ 1,
+ 0,
+ 45,
+ 0,
+ 0,
+ 0,
+ 1,
+ 2,
+ 0,
+ 0,
+ 1,
+ 1,
+ 35,
+ 2,
+ 79,
+ 0,
+ 8386,
+ 980,
+ 4,
+ 42,
+ 0,
+ 0,
+ 2,
+ 6,
+ 39,
+ 0,
+ 0]
+    }, {
+        name: "Detection",
+        data: [0,
+ 0,
+ 0,
+ 673,
+ 0,
+ 0,
+ 0,
+ 0,
+ 0,
+ 0,
+ 1,
+ 0,
+ 0,
+ 532,
+ 241,
+ 0,
+ 0,
+ 30,
+ 0,
+ 7,
+ 4,
+ 12,
+ 10,
+ 0,
+ 0,
+ 25,
+ 0,
+ 385,
+ 2,
+ 1,
+ 0,
+ 549,
+ 10,
+ 0,
+ 19,
+ 21,
+ 1,
+ 0,
+ 123,
+ 1,
+ 0,
+ 0]
+    }],
+
+    exporting: {
+        sourceWidth: 1000,
+        sourceHeight: 600
+    }
+
+});
+
+
+		</script>
+		</body>
+		</html>
