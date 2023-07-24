@@ -1,0 +1,69 @@
+#chart-area svg {
+	margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+#logo {
+	height:50px;
+}
+
+.navbar-brand {
+	height: 60px;
+	padding: 5px 0px;
+}
+
+/*  Line is used to set the vertical 
+portion of the graph should be grey 
+to improve legibility */
+
+.axisWhy line{
+  stroke:  #aeb3b7; 
+}
+
+/*  path is used to set the axis ticks 
+should be grey to improve legibility */
+
+.axisWhy path{
+  stroke: #aeb3b7;
+}
+
+/*  path is used to set the axis text 
+should be black to contrast grey axis 
+text */
+
+.axisWhy text{
+  fill: black;
+} 
+
+
+/*  Line is used to set the vertical 
+portion of the graph should be grey 
+to improve legibility */
+
+.axisEx line{
+  stroke:  #aeb3b7; 
+}
+
+/*  path is used to set the axis ticks 
+should be grey to improve legibility */
+
+.axisEx path{
+  stroke: #aeb3b7;
+}
+
+/*  path is used to set the axis text 
+should be black to contrast grey axis 
+text */
+
+.axisEx text{
+  fill: black;
+} 
+
+/* Can be used to set the fill colour 
+for a bar chart, however the colour is
+used for all bars 
+	rect {
+	fill: #3a6587;
+}
+*/
