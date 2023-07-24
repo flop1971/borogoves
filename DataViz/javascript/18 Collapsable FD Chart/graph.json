@@ -1,0 +1,25 @@
+{
+ "name": "linkedin_posts",
+ "children": [
+  {
+   "name": "aiethics (views)",
+   "children": [
+    {"name": "External", "size": 2921},
+    {"name": "Internal", "size": 654},
+    {
+     "name": "cluster",
+     "children": [
+      {"name": "HierarchicalCluster", "size": 6714},
+      {"name": "MergeEdge", "size": 743}
+     ]
+    },
+    {
+     "name": "optimization",
+     "children": [
+      {"name": "AspectRatioBanker", "size": 7074}
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet GeoJSON Example</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
+    <style type="text/css">
+        .leaflet-container{background-color:#c5e8ff;}
+    </style>
+</head>
+
+<body>
+    <div id="map" style="width: 1600px; height: 1400px"></div>
+
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script>
+        var myGeoJSONPath = 'custom.geo.json';
+        var myCustomStyle = {
+            stroke: false,
+            fill: true,
+            fillColor: '#fff',
+            fillOpacity: 1
+        }
+        $.getJSON(myGeoJSONPath,function(data){
+            var map = L.map('map').setView([39.74739, -105], 4);
+
+            L.geoJson(data, {
+                clickable: false,
+                style: myCustomStyle
+            }).addTo(map);
+        })
+        
+        
+        / Map the cities I have lived in!
+d3.csv("cities-lived.csv", function(data) {
+
+svg.selectAll("circle")
+	.data(data)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d) {
+		return projection([d.lon, d.lat])[0];
+	})
+	.attr("cy", function(d) {
+		return projection([d.lon, d.lat])[1];
+	})
+	.attr("r", function(d) {
+		return Math.sqrt(d.years) * 4;
+	})
+		.style("fill", "rgb(217,91,67)")	
+		.style("opacity", 0.85)	
+
+	// Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
+	// http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+	.on("mouseover", function(d) {      
+    	div.transition()        
+      	   .duration(200)      
+           .style("opacity", .9);      
+           div.text(d.place)
+           .style("left", (d3.event.pageX) + "px")     
+           .style("top", (d3.event.pageY - 28) + "px");    
+	})   
+
+    // fade out tooltip on mouse out               
+    .on("mouseout", function(d) {       
+        div.transition()        
+           .duration(500)      
+           .style("opacity", 0);   
+    </script>
+</body>
+</html>
