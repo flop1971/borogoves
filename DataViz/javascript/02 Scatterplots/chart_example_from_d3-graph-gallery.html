@@ -1,0 +1,98 @@
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 130, bottom: 30, left: 60},
+    width = 800 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+//Read the data
+d3.csv("unique_flight_31750_FT_sample3.csv", function(data) {
+
+  // Add X axis
+  var x = d3.scaleLinear()
+    .domain([2, 26])
+    .range([ 0, width ]);
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  // Add Y axis
+  var y = d3.scaleLinear()
+    .domain([-2, 2])
+    .range([ height, 0]);
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+  // Color scale: give me a specie name, I return a color
+  var color = d3.scaleOrdinal()
+    .domain(["FFT101", "FFT1031", "FFT1051", "FFT1071", "FFT1091", "FFT1111", "FFT1131", "FFT1141", "FFT1191", "FFT1211", "FFT1231", "FFT1311", "FFT391", "FFT93581", "FFT971"])
+    .range(["#FFFFFF", "#ECF2F6", "#DAE5EE", "#C8D8E5", "#B6CBDD", "#A3BED4", "#91B1CC", "#7FA5C3", "#6D98BB", "#5B8BB2", "#487EAA", "#3671A1", "#246499", "#125790", "#004B88"])
+
+  // Add dots
+  svg.append('g')
+    .selectAll("dot")
+    .data(data)
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return x(d.Distance); } )
+      .attr("cy", function (d) { return y(d.ArcTangent); } )
+      .attr("r", 5)
+      .style("fill", function (d) { return color(d.FlightNumber) } )
+      
+var Svg = d3.select("#my_dataviz")      
+
+// create a list of keys
+var keys = ["FFT101", "FFT1031", "FFT1051", "FFT1071", "FFT1091", "FFT1111", "FFT1131", "FFT1141", "FFT1191", "FFT1211", "FFT1231", "FFT1311", "FFT391", "FFT93581", "FFT971"]
+var flightcolour = ["#FFFFFF", "#ECF2F6", "#DAE5EE", "#C8D8E5", "#B6CBDD", "#A3BED4", "#91B1CC", "#7FA5C3", "#6D98BB", "#5B8BB2", "#487EAA", "#3671A1", "#246499", "#125790", "#004B88"]
+
+// Usually you have a color scale in your chart already
+var color = d3.scaleOrdinal()
+  .domain(keys)
+  .range(d3.schemeSet2);
+
+// Add one dot in the legend for each name.
+Svg.selectAll("mydots")
+  .data(keys)
+  .enter()
+  .append("circle")
+    .attr("cx", 100)
+    .attr("cy", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("r", 7)
+    .style("fill", function(d){ return color(d)})
+
+// Add one dot in the legend for each name.
+Svg.selectAll("mylabels")
+  .data(keys)
+  .enter()
+  .append("text")
+    .attr("x", 120)
+    .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+    .style("fill", function(d){ return color(d)})
+    .text(function(d){ return d})
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle")
+
+})
+
+</script>

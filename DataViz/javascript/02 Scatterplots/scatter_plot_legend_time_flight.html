@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.min.js"></script>
+    <title>Basic Scatter Plot</title>
+    <style>
+      body {
+        margin: 0px;
+      }
+      .domain {
+        display: none;
+      }
+      .tick line {
+        stroke: #cccccc;
+        stroke-width: 0.5;
+
+      }
+      .tick text, .legendCells text {
+        fill: #8E8883;
+        font-size: 8pt;
+        font-family: sans-serif;
+      }
+      .axis-label, .legend-label {
+        fill: #635F5D;
+        font-size:12pt;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="960" height="500"></svg>
+    <script>
+      const xValue = d => d.SchedDep_Epoch;
+      const xLabel = 'Epoch Time';
+      const yValue = d => d.FlightNumDec;
+      const yLabel = 'Flight Number (Decimal)';
+      const colorValue = d => d.FlightNumber;
+      const colorLabel = 'Flights';
+      const margin = { left: 150, right: 300, top: 80, bottom: 120 };
+
+      const svg = d3.select('svg');
+      const width = svg.attr('width');
+      const height = svg.attr('height');
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const g = svg.append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+      const xAxisG = g.append('g')
+          .attr('transform', `translate(0, ${innerHeight})`);
+      const yAxisG = g.append('g');
+      const colorLegendG = g.append('g')
+          .attr('transform', `translate(${innerWidth + 60}, 50)`);
+
+      xAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', innerWidth / 2)
+          .attr('y', 60)
+          .text(xLabel);
+
+      yAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', -innerHeight / 2)
+          .attr('y', -120)
+          .attr('transform', `rotate(-90)`)
+          .style('text-anchor', 'middle')
+          .text(yLabel);
+
+      colorLegendG.append('text')
+          .attr('class', 'legend-label')
+          .attr('x', -40)
+          .attr('y', -40)
+          .text(colorLabel);
+
+      const xScale = d3.scaleLinear();
+      const yScale = d3.scaleLinear();
+      const colorScale = d3.scaleOrdinal()
+        .range(["#D5F2FF", "#8EBAD7", "#4782AF", "#004B88", "#FFECB3", "#FFC277", "#FF983B", "#FF6F00", "#CFD8DC", "#96A0A5", "#5E696E", "#263238", "#FFBB80", "#D89963", "#B17846", "#8B572A"]);
+
+      const xAxis = d3.axisBottom()
+        .scale(xScale)
+        .ticks(6)
+        .tickPadding(15)
+        .tickSize(-innerHeight);
+
+      const yAxis = d3.axisLeft()
+        .scale(yScale)
+        .ticks(4)
+        .tickPadding(15)
+        .tickSize(-innerWidth);
+
+      const colorLegend = d3.legendColor()
+        .scale(colorScale)
+        .shape('circle');
+
+      const row = d => {
+        d.FlightNumDec = +d.FlightNumDec;
+        //d.petalWidth = +d.petalWidth;
+        d.SchedDep_Epoch = +d.SchedDep_Epoch;
+        //d.sepalWidth = +d.sepalWidth;
+        return d;
+      };
+      
+
+      d3.csv('unique_flightnumber_31750_Time_FlightNum_noreturn.csv', row, data => {
+        xScale
+          .domain(d3.extent(data, xValue))
+          .range([0, innerWidth])
+          .nice();
+
+        yScale
+          .domain(d3.extent(data, yValue))
+          .range([innerHeight, 0])
+          .nice();
+
+        g.selectAll('circle').data(data)
+          .enter().append('circle')
+            .attr('cx', d => xScale(xValue(d)))
+            .attr('cy', d => yScale(yValue(d)))
+            .attr('fill', d => colorScale(colorValue(d)))
+            .attr('fill-opacity', 1)
+            .attr('r', 4);
+
+        xAxisG.call(xAxis);
+        yAxisG.call(yAxis);
+        colorLegendG.call(colorLegend)
+          .selectAll('.cell text')
+            .attr('dy', '0.1em');
+            
+    svg.append("text")
+        .attr("x", 500)             
+        .attr("y", 50)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "24px") 
+        .style("text-decoration", "solid")  
+        .text("Relationship between Epoch Time & Epoch Time for flights from San Juan (Puerto Rico)");
+      });
+    </script>
+  </body>
+</html>
