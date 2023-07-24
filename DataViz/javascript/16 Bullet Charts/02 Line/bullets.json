@@ -1,0 +1,14 @@
+[
+  {"title":"Overall Score","subtitle":"out of 10","ranges":[3,6,10],"measures":[4.24,4.24],"markers":[7.5]},
+  {"title":"Chart Title","subtitle":"out of 2","ranges":[0.3,0.6,0.8],"measures":[0.52,0.52],"markers":[0.6]},   
+  {"title":"Gridlines","subtitle":"out of 2","ranges":[0.3,0.6,0.8],"measures":[0.48,0.48],"markers":[0.6]},
+  {"title":"Chart Axis","subtitle":"out of 2","ranges":[0.3,0.6,0.8],"measures":[0.44,0.44],"markers":[0.6]}, 
+  {"title":"Gestalt Theory","subtitle":"out of 3","ranges":[0.4,0.8,1.2],"measures":[0.48,0.48],"markers":[0.9]},
+  {"title":"Chart Creation","subtitle":"out of 2","ranges":[0.3,0.6,0.8],"measures":[0.4,0.4],"markers":[0.6]},
+  {"title":"Chart Colours","subtitle":"out of 3","ranges":[0.4,0.8,1.2],"measures":[0.4,0.4],"markers":[0.9]},
+  {"title":"Pre-Attentive","subtitle":"out of 3","ranges":[0.4,0.8,1.2],"measures":[0.36,0.36],"markers":[0.9]},
+  {"title":"Aspect Ratio","subtitle":"out of 2","ranges":[0.3,0.6,0.8],"measures":[0.32,0.32],"markers":[0.6]}, 
+  {"title":"Chart Legend","subtitle":"out of 2","ranges":[0.3,0.6,0.8],"measures":[0.2,0.2],"markers":[0.6]},
+  {"title":"Legend Colours","subtitle":"out of 3","ranges":[0.4,0.8,1.2],"measures":[0.16,0.16],"markers":[0.9]}   
+
+]
